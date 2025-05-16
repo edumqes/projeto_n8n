@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - N8N_HOST=n8n.local
+      - N8N_PORT=5678
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: always
+
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    restart: always
+
+volumes:
+  n8n_data:

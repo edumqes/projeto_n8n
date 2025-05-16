@@ -1,0 +1,183 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b8033187-2f1d-414d-854e-c03195f5fc24",
+      "name": "Início",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://api:3000/api/cadastro",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "id": "825a9ae9-1ce3-412f-b227-ea8f270f7e68",
+      "name": "Cadastrar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://api:3000/api/autenticar?id={{$json[\"id\"]}}&token={{$json[\"token\"]}}\n",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "id": "1fddd21a-0c17-4901-a10e-d6209214bc69",
+      "name": "Autenticar ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "= {{$json[\"success\"]}}",
+              "operation": "notEqual",
+              "value2": "={{ false }}"
+            }
+          ]
+        }
+      },
+      "id": "ecd82d3e-d513-4ca9-86ba-3fc008b448ac",
+      "name": "ID Autenticado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "prompt": {
+          "messages": [
+            {
+              "content": "Usuário autenticado com sucesso. Gere uma mensagem personalizada de boas vindas."
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "3ea36813-ad7d-4815-9343-786e2112d30f",
+      "name": "IA - OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "FV3xxEQLf29aZdlL",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "edumqes@gmail.com",
+        "toEmail": "edu_mqes@hotmail.com",
+        "subject": "Falha na autenticação de cadastro",
+        "text": "Não foi possível autenticar o ID {{$json[\"id\"]}}.",
+        "options": {}
+      },
+      "id": "7753deaf-4720-4801-b3a7-d4e8feb8575c",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "IREqQnusWet17T05",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Início": {
+      "main": [
+        [
+          {
+            "node": "Cadastrar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cadastrar": {
+      "main": [
+        [
+          {
+            "node": "Autenticar ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Autenticar ID": {
+      "main": [
+        [
+          {
+            "node": "ID Autenticado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID Autenticado?": {
+      "main": [
+        [
+          {
+            "node": "IA - OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7279c3b9-3a3c-4e24-835c-9a5f46a0edec",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "66e2f02a734c0f496c0f380fbc57e698f6ee0e9c04870ebc5f5b9715b0c740f6"
+  },
+  "id": "1y6Dq0SoYBLIKcaw",
+  "tags": []
+}
